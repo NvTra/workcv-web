@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <head>
     <title>Work CV</title>
     <meta charset="UTF-8" />
@@ -109,33 +113,70 @@
             <li class="nav-item active">
               <a th:href="@{/}" class="nav-link">Trang chủ</a>
             </li>
-            <li class="'nav-item">
+
+            <li
+              th:if="${theUser != null and theUser.role.roleName == 'EMPLOYER'}"
+              class="nav-item"
+            >
               <a href="/" class="nav-link">Công việc</a>
             </li>
-            <li class="nav-item">
+
+            <li
+              th:if="${theUser != null and theUser.role.roleName == 'EMPLOYER'}"
+              class="nav-item"
+            >
               <a href="/" class="nav-link">Ứng cử viên</a>
             </li>
-            <ul class="dropdown">
-              <li><a href="/">Hồ Sơ</a></li>
-              <li><a href="/save-job/get-list">Công việc đã lưu</a></li>
-              <li><a href="/user/list-post">Danh sách bài đăng</a></li>
-              <li><a href="/user/get-list-apply">Công việc đã ứng tuyển</a></li>
-              <li><a href="/user/get-list-company">Công ty đã theo dõi</a></li>
-              <li><a href="/auth/logout">Đăng xuất</a></li>
-            </ul>
-            <li></li>
-            <li class="nav-item cta mr-md-1">
-              <a href="/recruitment/post" class="nav-link">Đăng tuyển</a>
+
+            <li
+              th:if="${not #strings.isEmpty(#request.remoteUser)}"
+              class="nav-item dropdown"
+            >
+              <a
+                style="color: white"
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-toggle="dropdown"
+                aria-expanded="false"
+                >Đăng tuyển</a
+              >
+              <ul
+                style="left: -85px !important"
+                class="dropdown-menu"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li>
+                  <a class="dropdown-item" th:href="@{/detail}">Hồ Sơ</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" th:href="@{/recruitment/list-post}"
+                    >Danh sách bài đăng</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" th:href="@{/recruitment/post}"
+                    >Đăng Tuyển</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" th:href="@{/logout}">Đăng xuất</a>
+                </li>
+              </ul>
             </li>
-            <li class="nav-item cta cta-colored">
-              <a th:href="@{/auth/login}" class="nav-link">Đăng nhập</a>
-            </li>
+
+            <div th:if="${#strings.isEmpty(#request.remoteUser)}">
+              <li class="nav-item cta cta-colored">
+                <a th:href="@{/auth/login}" class="nav-link">Đăng nhập</a>
+              </li>
+            </div>
           </ul>
         </div>
       </div>
     </nav>
     <!-- END nav -->
-    <div
+    <!-- <div
       th:if="${msg_register_success}"
       class="toast"
       data-delay="2000"
@@ -157,15 +198,11 @@
           type: "success",
         });
       </script>
-    </div>
+    </div> -->
     <div
       class="hero-wrap img"
       th:style="'background-image: url('+@{/resources/assets/images/bg_1.jpg}+')'"
-      <!--
-      style="background-image: url(assets/images/bg_1.jpg)"
-      --
     >
-      >
       <div class="overlay"></div>
       <div class="container">
         <div
@@ -725,17 +762,41 @@
                 <h2 class="mb-4">Công ty nổi bật</h2>
               </div>
             </div>
-            <!--               <th:block th:each="companies : ${companies}">
-                <div class="sidebar-box">
-                    <div class="">
-                        <a th:href="${'/user/detail-company/'}+${companies[0]}" class="company-wrap"><img th:src="${companies[2]}" class="img-fluid" alt="Colorlib Free Template"></a>
-                        <div class="text p-3">
-                            <h3><a th:href="${'/user/detail-company/'}+${companies[0]}" th:text="${companies[1]}"></a></h3>
-                            <p><span class="number" style="color: black" th:text="${companies[3]}"></span> <span>Vị trí ứng tuyển</span></p>
-                        </div>
+            <th:block th:each="companies : ${companies}">
+              <div class="sidebar-box">
+                <div class="">
+                  <a
+                    th:href="${'/user/detail-company/' + companies.id}"
+                    class="company-wrap"
+                  >
+                    <div th:if="${companies.logo!=null}">
+                      <img
+                        th:src="'data:image/png;base64,' +
+                      ${imgUtil.getImgData(companies.logo)}"
+                        class="img-fluid"
+                        alt="Colorlib Free Template"
+                      />
                     </div>
+                  </a>
+                  <div class="text p-3">
+                    <h3>
+                      <a
+                        th:href="${'/user/detail-company/'+companies.id}"
+                        th:text="${companies.nameCompany}"
+                      ></a>
+                    </h3>
+                    <p>
+                      <span
+                        class="number"
+                        style="color: black"
+                        th:text="${companies.address}"
+                      ></span>
+                      <span>Vị trí ứng tuyển</span>
+                    </p>
+                  </div>
                 </div>
-                </th:block>-->
+              </div>
+            </th:block>
           </div>
         </div>
       </div>
