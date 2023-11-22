@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.tranv.workcv.dao.UserDAO;
-import com.tranv.workcv.dto.Registerdto;
+import com.tranv.workcv.dto.RegisterDTO;
 import com.tranv.workcv.entity.User;
 import com.tranv.workcv.service.RoleService;
 
@@ -41,7 +41,7 @@ public class UserDaoImpl implements UserDAO {
 
 	// Method to save user to database
 	@Override
-	public void saveUser(Registerdto theUser) {
+	public void saveUser(RegisterDTO theUser) {
 		
 		Session currentSession = sessionFactory.getCurrentSession();
 		User newUser = convertToEntity(theUser);
@@ -89,7 +89,7 @@ public class UserDaoImpl implements UserDAO {
 		return theUser;
 	}
 
-	private User convertToEntity(Registerdto dto) {
+	private User convertToEntity(RegisterDTO dto) {
 		User newUser = new User();
 		newUser.setEmail(dto.getEmail());
 		newUser.setFullName(dto.getFullName());

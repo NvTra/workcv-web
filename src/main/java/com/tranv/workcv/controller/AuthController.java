@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tranv.workcv.dto.Registerdto;
+import com.tranv.workcv.dto.RegisterDTO;
 import com.tranv.workcv.service.UserService;
 
 @Controller
@@ -48,7 +48,7 @@ public class AuthController {
 	// Handle the request to show the access denied page.
 	@GetMapping("/access-denied")
 	public String accessDeniel() {
-		return "access-denied";
+		return "errors/error-404";
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class AuthController {
 	 */
 
 	@PostMapping("/register")
-	public String addUser(@ModelAttribute("newUser") Registerdto newUser) {
+	public String addUser(@ModelAttribute("newUser") RegisterDTO newUser) {
 		System.out.println(newUser.toString());
 		userService.saveUser(newUser);
 		return "redirect:/";

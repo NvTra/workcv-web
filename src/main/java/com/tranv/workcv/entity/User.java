@@ -48,8 +48,8 @@ public class User {
 	@Column(name = "phone_number")
 	private String phoneNumber;
 
-	@Column(name = "image", columnDefinition = "MEDIUMBLOB")
-	private byte[] image;
+	@Column(name = "image")
+	private String image;
 
 	@Column(name = "description")
 	private String description;
@@ -88,9 +88,5 @@ public class User {
 			@JoinColumn(name = "recruitment_id") })
 	private Set<Recruitment> recruitments = new HashSet<>();
 
-	@Override
-	public String toString() {
-		return "User [fullName=" + fullName + ", email=" + email + ", role=" + role.getId() + "]";
-	}
-	
+
 }

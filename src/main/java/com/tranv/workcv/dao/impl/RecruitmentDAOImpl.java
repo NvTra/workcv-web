@@ -66,7 +66,7 @@ public class RecruitmentDAOImpl implements RecruitmentDAO {
 	@Override
 	public void deleteRecruitment(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Query<Recruitment> theQuery = currentSession.createQuery("delete from Recruitment where Id=:recruitmentId",Recruitment.class);
+		Query theQuery = currentSession.createQuery("delete from Recruitment where Id=:recruitmentId");
 		theQuery.setParameter("recruitmentId", theId);
 		theQuery.executeUpdate();
 	}

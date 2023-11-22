@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ import com.tranv.workcv.service.CompanyService;
 import com.tranv.workcv.service.RecruitmentService;
 import com.tranv.workcv.service.SaveJobService;
 import com.tranv.workcv.service.UserService;
+import com.tranv.workcv.until.Pagination;
 
 @Controller
 @RequestMapping("/recruitment")
@@ -72,8 +74,8 @@ public class RecruitmentController {
 	@GetMapping("/post")
 	public String postJob(Model theModel) {
 		List<Category> categories = categoryService.getCategories();
-		theModel.addAttribute("jobCategories", categories);
-		return "job-post";
+		theModel.addAttribute("categories", categories);
+		return "public/post-job";
 	}
 
 	// Handle the request to display the list of job posts.
@@ -81,19 +83,12 @@ public class RecruitmentController {
 	public String showDonation(@RequestParam(name = "page", defaultValue = "1") int currentPage, Model theModel) {
 		Company company = getCompanyByUser();
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitmentByCompany(company.getId());
-		int itemsPerPage = 5;
-		int totalPages = (int) Math.ceil((double) recruitments.size() / itemsPerPage);
-		int startIndex = (currentPage - 1) * itemsPerPage;
-		List<Recruitment> currentPageDonations = recruitments.subList(startIndex,
-				Math.min(startIndex + itemsPerPage, recruitments.size()));
-		theModel.addAttribute("currentPage", currentPage);
-		theModel.addAttribute("totalPages", totalPages);
-		theModel.addAttribute("recruitment", currentPageDonations);
-		return "list-post";
+		Pagination.pagination(recruitments, currentPage, theModel);
+		return "public/post-list";
 	}
 
 	// Handle the request to add a new job post.
-	@PostMapping("/addRecruitment")
+	@PostMapping("/add")
 	public String addRecruitment(@ModelAttribute("recruitment") Recruitment newRecruitment) {
 		Company company = getCompanyByUser();
 		newRecruitment.setCompany(company);
@@ -102,101 +97,80 @@ public class RecruitmentController {
 	}
 
 	// Handle the request to show the form for updating a job post.
-	@GetMapping("/showFormForUpdate")
+	@GetMapping("/editpost")
 	public String showFormForUpdate(@RequestParam("recruitmentId") int theId, Model theModel) {
 		List<Category> categories = categoryService.getCategories();
-		theModel.addAttribute("jobCategories", categories);
+		theModel.addAttribute("categories", categories);
 		Recruitment recruitment = recruitmentService.getRecruitmentById(theId);
 		theModel.addAttribute("recruitment", recruitment);
-		return "job-edit";
+		return "public/edit-job";
 	}
 
 	// This method updates the provided recruitment object using the
 	// recruitmentService,
-	@PostMapping("/updateRecruitment")
+	@PostMapping("/edit")
 	public String updateRecruitment(@ModelAttribute("recruitment") Recruitment recruitment) {
 		recruitmentService.update(recruitment);
-		return "redirect:/recruitment/list-post";
+		return "redirect:/recruitment/editpost?recruitmentId=" + recruitment.getId();
 	}
 
 	// Display the details of a job post.
 	@GetMapping("/detail")
-	public String detailJob(@RequestParam("recruitmentId") int theId, Model theModel) {
-		Recruitment recruitment = recruitmentService.getRecruitmentById(theId);
+	public String detailJob(@RequestParam("recruitmentId") int recruitmentId, Model theModel) {
+		Recruitment recruitment = recruitmentService.getRecruitmentById(recruitmentId);
 		User theUser = getUser();
 		if (theUser != null) {
 			int userId = theUser.getId();
 			boolean isSaveJob = theUser.getRecruitments().stream()
 					.anyMatch(saveJob -> saveJob.getId() == recruitment.getId());
 			if (isSaveJob) {
-				saveJobService.unSaveJob(theId, userId);
+				saveJobService.unSaveJob(recruitmentId, userId);
 			} else {
-				saveJobService.saveJob(theId, userId);
+				saveJobService.saveJob(recruitmentId, userId);
 			}
 			theModel.addAttribute("isSaveJob", isSaveJob);
 		}
-
-		List<ApplyPost> listApplyPosts = applyPostService.listApplyPostByRecruitmentId(theId);
+		List<ApplyPost> listApplyPosts = applyPostService.listApplyPostByRecruitmentId(recruitmentId);
 		theModel.addAttribute("applyPosts", listApplyPosts);
 		theModel.addAttribute("recruitment", recruitment);
-
-		return "job-detail";
+		return "public/detail-post";
 	}
 
 	// Delete a job post.
 	@GetMapping("/delete")
-	public String deleteRecruitment(@RequestParam("recruitmentId") int theId) {
-		recruitmentService.deleteRecruitment(theId);
+	public String deleteRecruitment(@RequestParam("recruitmentId") int recruitmentId) {
+		recruitmentService.deleteRecruitment(recruitmentId);
 		return "redirect:/recruitment/list-post";
 	}
 
 	// Search for job posts based on a search term.
 	@GetMapping("/search")
 	public String searchRecruitment(@RequestParam(name = "page", defaultValue = "1") int currentPage,
-			@RequestParam("keySearch") String searchTerm, Model theModel) {
-		List<Recruitment> recruitments = recruitmentService.getResultRecruitment(searchTerm);
-		int itemsPerPage = 5;
-		int totalPages = (int) Math.ceil((double) recruitments.size() / itemsPerPage);
-		int startIndex = (currentPage - 1) * itemsPerPage;
-		List<Recruitment> currentPageDonations = recruitments.subList(startIndex,
-				Math.min(startIndex + itemsPerPage, recruitments.size()));
-		theModel.addAttribute("currentPage", currentPage);
-		theModel.addAttribute("totalPages", totalPages);
-		theModel.addAttribute("recruitment", currentPageDonations);
-
-		return "result-search";
+			@RequestParam("keySearch") String keySearch, Model theModel) {
+		List<Recruitment> recruitments = recruitmentService.getResultRecruitment(keySearch);
+		Pagination.pagination(recruitments, currentPage, theModel);
+		theModel.addAttribute("keySearch", keySearch);
+		return "public/result-search";
 	}
 
 	// Search for job posts based on an address search term.
 	@GetMapping("/searchaddress")
 	public String searchAdress(@RequestParam(name = "page", defaultValue = "1") int currentPage,
-			@RequestParam("keySearch") String searchTerm, Model theModel) {
-		List<Recruitment> recruitments = recruitmentService.getResultAdress(searchTerm);
-		int itemsPerPage = 5;
-		int totalPages = (int) Math.ceil((double) recruitments.size() / itemsPerPage);
-		int startIndex = (currentPage - 1) * itemsPerPage;
-		List<Recruitment> currentPageDonations = recruitments.subList(startIndex,
-				Math.min(startIndex + itemsPerPage, recruitments.size()));
-		theModel.addAttribute("currentPage", currentPage);
-		theModel.addAttribute("totalPages", totalPages);
-		theModel.addAttribute("recruitment", currentPageDonations);
-		return "result-search-address";
+			@RequestParam("keySearch") String keySearch, Model theModel) {
+		List<Recruitment> recruitments = recruitmentService.getResultAdress(keySearch);
+		Pagination.pagination(recruitments, currentPage, theModel);
+		theModel.addAttribute("keySearch", keySearch);
+		return "public/result-search-address";
 	}
 
 	// Search for job posts based on a company search term.
 	@GetMapping("/searchcompany")
 	public String searchCompany(@RequestParam(name = "page", defaultValue = "1") int currentPage,
-			@RequestParam("keySearch") String searchTerm, Model theModel) {
-		List<Recruitment> recruitments = recruitmentService.getResultCompany(searchTerm);
-		int itemsPerPage = 5;
-		int totalPages = (int) Math.ceil((double) recruitments.size() / itemsPerPage);
-		int startIndex = (currentPage - 1) * itemsPerPage;
-		List<Recruitment> currentPageDonations = recruitments.subList(startIndex,
-				Math.min(startIndex + itemsPerPage, recruitments.size()));
-		theModel.addAttribute("currentPage", currentPage);
-		theModel.addAttribute("totalPages", totalPages);
-		theModel.addAttribute("recruitment", currentPageDonations);
-		return "result-search-company";
+			@RequestParam("keySearch") String keySearch, Model theModel) {
+		List<Recruitment> recruitments = recruitmentService.getResultCompany(keySearch);
+		Pagination.pagination(recruitments, currentPage, theModel);
+		theModel.addAttribute("keySearch", keySearch);
+		return "public/result-search-company";
 	}
 
 	// Confirm an applied job post.

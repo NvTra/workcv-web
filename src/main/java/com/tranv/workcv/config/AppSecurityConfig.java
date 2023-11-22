@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 
 @Configuration
 @EnableWebSecurity
@@ -42,10 +43,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/user/**").hasAnyRole("EMPLOYER", "CANDIDATE")
 
 				.antMatchers("/**").permitAll()
-				
 
 				.antMatchers("/resources/**").permitAll()
-				
+
 				.antMatchers("/resources/assets/**").permitAll()
 
 				.antMatchers("/css/**").permitAll()
@@ -86,4 +86,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 		return filter;
 	}
 
+	@Bean
+	public SpringSecurityDialect securityDialect() {
+		return new SpringSecurityDialect();
+	}
 }

@@ -76,7 +76,6 @@ public class CompanyController {
 		}
 
 		theModel.addAttribute("company", theCompany);
-
 		return "detail-company";
 	}
 

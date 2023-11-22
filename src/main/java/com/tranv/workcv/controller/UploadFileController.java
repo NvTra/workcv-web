@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +29,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.tranv.workcv.entity.Cv;
@@ -40,7 +39,6 @@ import com.tranv.workcv.service.CvService;
 import com.tranv.workcv.service.UserService;
 
 @Controller
-
 public class UploadFileController {
 	@Autowired
 	private UserService userService;
@@ -53,7 +51,7 @@ public class UploadFileController {
 	// save File
 	@PostMapping("saveCvFile")
 	public ModelAndView saveimage(@ModelAttribute("cv") Cv theCv, @RequestParam("userId") int theId,
-			@RequestParam CommonsMultipartFile file, HttpSession session) throws Exception {
+			@RequestParam MultipartFile file, HttpSession session) throws Exception {
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(THRESHOLD_SIZE);
@@ -61,7 +59,6 @@ public class UploadFileController {
 		factory.setRepository(f);
 
 		String fileName = file.getOriginalFilename();
-		System.out.println(fileName);
 
 		User theUser = userService.getUserById(theId);
 
@@ -90,7 +87,7 @@ public class UploadFileController {
 	public ResponseEntity<InputStreamResource> downloadLargeFile(@RequestParam("name") String fileName)
 			throws Exception {
 		File f = new File(System.getProperty("user.dir"));
-		System.out.println(f);
+
 		File file = new File(System.getProperty("user.dir") + File.separator + fileName);
 		System.out.println(file);
 
@@ -106,4 +103,10 @@ public class UploadFileController {
 		return ResponseEntity.ok().headers(httpHeaders).contentLength(file.length())
 				.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
 	}
+	
+	 
+
+	   
+
+	  
 }

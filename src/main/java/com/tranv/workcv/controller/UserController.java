@@ -1,7 +1,13 @@
 package com.tranv.workcv.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,14 +20,19 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.tranv.workcv.entity.ApplyPost;
 import com.tranv.workcv.entity.Company;
+
 import com.tranv.workcv.entity.User;
 import com.tranv.workcv.service.ApplyPostService;
 import com.tranv.workcv.service.CompanyService;
+
 import com.tranv.workcv.service.UserService;
+import com.tranv.workcv.until.Pagination;
+import com.tranv.workcv.until.UploadFileUtil;
 
 @Controller
 @RequestMapping("/user")
@@ -41,24 +52,75 @@ public class UserController {
 		return theUser;
 	};
 
-	
-
 	// Update the user's profile.
 	@PostMapping("/update-profile")
 	public String updateProfile(@ModelAttribute("user") User theUser) {
+
 		userService.update(theUser);
 		return "redirect:/detail";
 	}
 
-	// Update the user's avatar.
-	@PostMapping("/update-avatar")
-	public String updateAvatar(@RequestParam("userId") int theId, @RequestParam("avatar") MultipartFile multipartFile)
-			throws IOException {
-		User user = userService.getUserById(theId);
-		byte[] image = multipartFile.getBytes();
-		user.setImage(image);
-		userService.update(user);
-		return "redirect:/detail";
+	@PostMapping("/upload")
+	public @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile file,
+			@RequestParam("email") String email, HttpSession session) {
+		System.out.println("email" + email);
+		try {
+			User user = getUser();
+			String rootDir = UploadFileUtil.UPLOAD_DIR("image", session);
+
+			int index = file.getOriginalFilename().lastIndexOf('.');
+
+			String extension = null;
+			if (index > 0) {
+				extension = file.getOriginalFilename().substring(index + 1);
+			}
+			String fileName = "User_img_" + user.getId() + "." + extension;
+			System.out.println(fileName);
+
+			Path filePath = Paths.get(rootDir, fileName);
+
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			user.setImage(fileName);
+			userService.update(user);
+
+			String urlImg = "resources/upload/image/" + user.getImage();
+
+			return urlImg;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Error";
+		}
+	}
+
+	@PostMapping("/uploadCv")
+	public @ResponseBody String handleFileUploadCv(@RequestParam("file") MultipartFile file, HttpSession session) {
+
+		try {
+			User user = getUser();
+			String rootDir = UploadFileUtil.UPLOAD_DIR("cvpdf", session);
+
+			int index = file.getOriginalFilename().lastIndexOf('.');
+
+			String extension = null;
+			if (index > 0) {
+				extension = file.getOriginalFilename().substring(index + 1);
+			}
+			String fileName = "User_cv_" + user.getId() + "." + extension;
+			System.out.println(fileName);
+
+			Path filePath = Paths.get(rootDir, fileName);
+
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			user.setImage(fileName);
+			userService.update(user);
+
+			String urlImg = "resources/upload/cvpdf/" + fileName;
+
+			return urlImg;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "Error";
+		}
 	}
 
 	// Update the user's company information.
@@ -80,13 +142,6 @@ public class UserController {
 		company.setLogo(logo);
 		companyService.saveOrUpdateCompany(company);
 		return "redirect:/detail";
-	}
-
-	// Upload a file.
-	@PostMapping(value = "/uploadFile")
-	public String submit(@RequestParam("file") MultipartFile file, ModelMap modelMap) {
-		modelMap.addAttribute("file", file);
-		return "fileUploadView";
 	}
 
 	// Confirm the user's account.
@@ -113,22 +168,9 @@ public class UserController {
 		int userId = theUser.getId();
 		Company theCompany = companyService.getCompanyByUserId(userId);
 		int companyId = theCompany.getId();
-
 		List<ApplyPost> applyPosts = applyPostService.listApplyPostsByCompany(companyId);
-
-		int itemsPerPage = 5;
-		// tổng số trang
-		int totalPages = (int) Math.ceil((double) applyPosts.size() / itemsPerPage);
-		// tính vị trí chỉ mục đầu tiên trên trnag hiện tại
-		int startIndex = (currentPage - 1) * itemsPerPage;
-		// lấy danh sách đợt quyên góp cho trang hiện tại
-		List<ApplyPost> currentPageDonations = applyPosts.subList(startIndex,
-				Math.min(startIndex + itemsPerPage, applyPosts.size()));
-		theModel.addAttribute("currentPage", currentPage);
-		theModel.addAttribute("totalPages", totalPages);
-		theModel.addAttribute("applyPosts", currentPageDonations);
-
-		return "list-user";
+		Pagination.pagination(applyPosts, currentPage, theModel);
+		return "public/list-user";
 	}
 
 }

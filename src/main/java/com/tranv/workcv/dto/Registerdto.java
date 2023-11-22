@@ -5,17 +5,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Registerdto {
+public class RegisterDTO {
 	private String email;
 	private String fullName;
 	private String password;
 	private String rePassword;
 	private int roleId;
-	@Override
-	public String toString() {
-		return "Registerdto [email=" + email + ", fullName=" + fullName + ", password=" + password + ", rePassword="
-				+ rePassword + ", roleId=" + roleId + "]";
-	}
+
 	
 	
 }

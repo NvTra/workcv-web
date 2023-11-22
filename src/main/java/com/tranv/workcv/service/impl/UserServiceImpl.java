@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tranv.workcv.dao.UserDAO;
-import com.tranv.workcv.dto.Registerdto;
+import com.tranv.workcv.dto.RegisterDTO;
 import com.tranv.workcv.entity.User;
 import com.tranv.workcv.service.UserService;
 
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	// Method to save user to database
 	@Override
 	@Transactional
-	public void saveUser(Registerdto theUser) {
+	public void saveUser(RegisterDTO theUser) {
 		userDAO.saveUser(theUser);
 
 	}
