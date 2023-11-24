@@ -3,7 +3,6 @@ package com.tranv.workcv.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
 
 import com.tranv.workcv.entity.Category;
 import com.tranv.workcv.entity.Company;
@@ -57,13 +55,14 @@ public class HomeController {
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitmentBySalary();
 		theModel.addAttribute("recruitments", recruitments);
 		List<Company> companies = companyService.getCompanyTop();
+		
 		theModel.addAttribute("companies", companies);
 		return "public/home";
 	}
 
 	// Handle the request to show the user profile page.
 	@GetMapping("/detail")
-	public String detail(Model theModel, HttpSession session) {
+	public String detail(Model theModel) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String email = authentication.getName();
 		User theUser = userService.findByEmail(email);
@@ -76,5 +75,4 @@ public class HomeController {
 		return "public/profile";
 	}
 
-	
 }

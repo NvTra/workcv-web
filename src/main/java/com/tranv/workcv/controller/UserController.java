@@ -1,10 +1,10 @@
 package com.tranv.workcv.controller;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -14,9 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,14 +25,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.tranv.workcv.entity.ApplyPost;
 import com.tranv.workcv.entity.Company;
+import com.tranv.workcv.entity.Cv;
 
 import com.tranv.workcv.entity.User;
 import com.tranv.workcv.service.ApplyPostService;
 import com.tranv.workcv.service.CompanyService;
+import com.tranv.workcv.service.CvService;
+import com.tranv.workcv.service.FollowCompanyService;
 
 import com.tranv.workcv.service.UserService;
 import com.tranv.workcv.until.Pagination;
-import com.tranv.workcv.until.UploadFileUtil;
 
 @Controller
 @RequestMapping("/user")
@@ -43,6 +45,10 @@ public class UserController {
 	private CompanyService companyService;
 	@Autowired
 	private ApplyPostService applyPostService;
+	@Autowired
+	private CvService cvService;
+	@Autowired
+	private FollowCompanyService followCompanyService;
 
 	// Retrieve the currently authenticated user.
 	private User getUser() {
@@ -60,13 +66,17 @@ public class UserController {
 		return "redirect:/detail";
 	}
 
+	// upload image
 	@PostMapping("/upload")
 	public @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile file,
 			@RequestParam("email") String email, HttpSession session) {
 		System.out.println("email" + email);
 		try {
 			User user = getUser();
-			String rootDir = UploadFileUtil.UPLOAD_DIR("image", session);
+			// String rootDir = UploadFileUtil.UPLOAD_DIR("image", session);
+			// System.out.println("rootDir: " + rootDir);
+			String rootDir = session.getServletContext().getRealPath("/resources/upload/image");
+			System.out.println("rootContext: " + rootDir);
 
 			int index = file.getOriginalFilename().lastIndexOf('.');
 
@@ -94,10 +104,14 @@ public class UserController {
 
 	@PostMapping("/uploadCv")
 	public @ResponseBody String handleFileUploadCv(@RequestParam("file") MultipartFile file, HttpSession session) {
-
+		User user = getUser();
+		Cv cv = cvService.getCvByUserId(user.getId());
+		if (cv == null) {
+			cv = new Cv();
+		}
 		try {
-			User user = getUser();
-			String rootDir = UploadFileUtil.UPLOAD_DIR("cvpdf", session);
+
+			String rootDir = session.getServletContext().getRealPath("/resources/upload/cvpdf");
 
 			int index = file.getOriginalFilename().lastIndexOf('.');
 
@@ -106,14 +120,15 @@ public class UserController {
 				extension = file.getOriginalFilename().substring(index + 1);
 			}
 			String fileName = "User_cv_" + user.getId() + "." + extension;
-			System.out.println(fileName);
-
 			Path filePath = Paths.get(rootDir, fileName);
 
 			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-			user.setImage(fileName);
-			userService.update(user);
 
+			// save cv in db
+
+			cv.setUser(user);
+			cv.setFileName(fileName);
+			cvService.saveCv(cv);
 			String urlImg = "resources/upload/cvpdf/" + fileName;
 
 			return urlImg;
@@ -123,6 +138,24 @@ public class UserController {
 		}
 	}
 
+	// Delete Cv
+	@GetMapping("deleteCv")
+	public String deleteCv(@RequestParam("cvId") int cvId) {
+		cvService.deleteCv(cvId);
+		return "redirect:/detail";
+	}
+
+	// Handle the request to view the list of followed companies.
+	@GetMapping("/get-list-company")
+	public String listFollowCompany(@RequestParam(name = "page", defaultValue = "1") int currentPage, Model theModel) {
+		User theUser = getUser();
+		int theId = theUser.getId();
+		List<Company> companies = followCompanyService.listCompanyFollow(theId);
+		Pagination.pagination(companies, currentPage, theModel);
+		return "public/list-follow-company";
+
+	}
+
 	// Update the user's company information.
 	@PostMapping("/update-company")
 	public String updateCompany(@ModelAttribute("company") Company theCompany) {
@@ -130,17 +163,6 @@ public class UserController {
 		theCompany.setStatus(1);
 		theCompany.setUser(theUser);
 		companyService.saveOrUpdateCompany(theCompany);
-		return "redirect:/detail";
-	}
-
-	// Update the user's company logo.
-	@PostMapping("/update-logo-company")
-	public String updateLogoCompany(@RequestParam("id") int theId,
-			@RequestParam("logoCompany") MultipartFile multipartFile) throws IOException {
-		Company company = companyService.getCompanyById(theId);
-		byte[] logo = multipartFile.getBytes();
-		company.setLogo(logo);
-		companyService.saveOrUpdateCompany(company);
 		return "redirect:/detail";
 	}
 
@@ -173,4 +195,22 @@ public class UserController {
 		return "public/list-user";
 	}
 
+	// Apply Job
+	// Display the list of job applications for the currently authenticated user.
+	@GetMapping("/get-list-apply")
+	public String listApplyJob(@RequestParam(name = "page", defaultValue = "1") int currentPage, Model theModel) {
+		User theUser = getUser();
+		int theId = theUser.getId();
+		List<ApplyPost> applyPosts = applyPostService.listApplyPostsByUser(theId);
+		Pagination.pagination(applyPosts, currentPage, theModel);
+		return "public/list-apply-job";
+	}
+
+	@GetMapping("delete-apply/{applyJobId}")
+	public String deleteApply(@PathVariable("applyJobId") int applyJobId) {
+		System.out.println(applyJobId);
+		applyPostService.deleteJob(applyJobId);
+		return "redirect:/user/get-list-apply";
+
+	}
 }

@@ -45,7 +45,7 @@ public class CvDaoImpl implements CvDAO {
 	@Override
 	public void deleteCv(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Query<Cv> theQuery = currentSession.createQuery("delete from Cv where id:=theId",Cv.class);
+		Query theQuery = currentSession.createQuery("delete from Cv where id= :theId");
 		theQuery.setParameter("theId", theId);
 		theQuery.executeUpdate();
 	}

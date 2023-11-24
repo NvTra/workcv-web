@@ -15,4 +15,5 @@ public interface CompanyService {
 
 	public void saveOrUpdateCompany(Company theCompany);
 
+	public int numberOfApplicants(int companyId);
 }

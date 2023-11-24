@@ -11,11 +11,10 @@ import org.springframework.stereotype.Repository;
 import com.tranv.workcv.dao.ApplyPostDAO;
 import com.tranv.workcv.entity.ApplyPost;
 
-
 @Repository
 public class ApplyPostDAOImpl implements ApplyPostDAO {
-	//DAO handles operations related to the ApplyPost object
-	
+	// DAO handles operations related to the ApplyPost object
+
 	@Autowired
 	private SessionFactory sessionFactory;
 
@@ -81,7 +80,7 @@ public class ApplyPostDAOImpl implements ApplyPostDAO {
 	@Override
 	public void deleteJob(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Query<ApplyPost> theQuery = currentSession.createQuery("delete from ApplyPost where id:=applyPostId", ApplyPost.class);
+		Query theQuery = currentSession.createQuery("delete from ApplyPost where id= :applyPostId");
 		theQuery.setParameter("applyPostId", theId);
 		theQuery.executeUpdate();
 

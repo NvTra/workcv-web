@@ -14,5 +14,6 @@ public interface CompanyDAO {
 	public void saveOrUpdateCompany(Company theCompany);
 
 	public Company getCompanyById(int theId);
-
+	
+	public int numberOfApplicants(int companyId);
 }

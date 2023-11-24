@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.tranv.workcv.dao.CompanyDAO;
 import com.tranv.workcv.entity.Company;
+import com.tranv.workcv.entity.Recruitment;
 
 @Repository
 public class CompanyDAOImpl implements CompanyDAO {
@@ -66,6 +67,16 @@ public class CompanyDAOImpl implements CompanyDAO {
 		Session currentSession = sessionFactory.getCurrentSession();
 		currentSession.saveOrUpdate(theCompany);
 
+	}
+
+	@Override
+	public int numberOfApplicants(int companyId) {
+		Session currentSession = sessionFactory.getCurrentSession();
+		Query<Recruitment> query = currentSession
+				.createQuery("select r from Recruitment r JOIN r.Company c WHERE c.id = :companyId", Recruitment.class);
+		query.setParameter("companyId", companyId);
+		List<Recruitment> recruitments = query.getResultList();
+		return recruitments.size();
 	}
 
 }
