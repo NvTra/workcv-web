@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<title>Work CV</title>
@@ -66,7 +66,7 @@
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Ứng cử viên</a>
+						<a th:href="@{/user/list-user}" class="nav-link">Ứng cử viên</a>
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
@@ -92,7 +92,7 @@
 
 					<!--CADIDATE-->
 					<li sec:authorize="hasRole('CANDIDATE')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Công việc</a>
+						<a th:href="@{/user/get-list-apply}" class="nav-link">Công việc</a>
 					</li>
 					<li sec:authorize="hasRole('CANDIDATE')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
 						class="nav-item dropdown">
@@ -176,13 +176,14 @@
 											<span class="subadge" th:text="${recruitment.type}"></span>
 											<h2 class="mr-3 text-black">
 												<a th:text="${recruitment.title}"
-													th:href="${'/recruitment/detail/'} +${recruitment.id}"></a>
+													th:href="@{/recruitment/detail(recruitmentId=${recruitment.id})}"></a>
 											</h2>
 										</div>
 										<div class="job-post-item-body d-block d-md-flex">
 											<div class="mr-3">
 												<span class="icon-layers"></span>
-												<a href="#" th:text="${recruitment.Company.nameCompany}"></a>
+												<a th:href="@{/company/detail-company(companyId=${recruitment.company.id})}"
+													th:text="${recruitment.Company.nameCompany}"></a>
 											</div>
 											<div>
 												<span class="icon-my_location"></span>

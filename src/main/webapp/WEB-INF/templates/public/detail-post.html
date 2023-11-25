@@ -62,7 +62,7 @@
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Ứng cử viên</a>
+						<a th:href="@{/user/list-user}" class="nav-link">Ứng cử viên</a>
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
@@ -88,7 +88,7 @@
 
 					<!--CADIDATE-->
 					<li sec:authorize="hasRole('CANDIDATE')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Công việc</a>
+						<a th:href="@{/user/get-list-apply}" class="nav-link">Công việc</a>
 					</li>
 					<li sec:authorize="hasRole('CANDIDATE')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
 						class="nav-item dropdown">
@@ -320,9 +320,6 @@
 					<h2 class="section-title mb-2" th:if="${applyPosts}">
 						Danh sách ứng viên ứng tuyển
 					</h2>
-					<h2 class="section-title mb-2" th:unless="${applyPosts}">
-						Những công việc liên quan
-					</h2>
 				</div>
 			</div>
 
@@ -336,7 +333,7 @@
                   ">
 								<div class="team d-md-flex p-4 bg-white">
 									<img class="img"
-										th:src="${applyPost.user.image != null ? applyPost.user.image : 'https://st.quantrimang.com/photos/image/072015/22/avatar.jpg'}" />
+										th:src="${applyPost.user.image != null ? '/spring-workcv/resources/upload/image/'+applyPost.user.image : 'https://st.quantrimang.com/photos/image/072015/22/avatar.jpg'}" />
 									<div class="text pl-md-4">
 										<h5 class="location mb-0" th:text="${applyPost.user.fullName}"></h5>
 										<p style="display: block; color: black" th:text="${applyPost.user.address}"></p>
@@ -348,15 +345,16 @@
 										<div class="row">
 											<p>
 												<a href="#" th:if="${applyPost.nameCv != null}" class="btn btn-primary"
-													th:href="${'http://localhost:8080/resources/uploads/'} +${applyPost.nameCv}">Xem
+													th:href="@{/resources/upload/cvpdf/} +${applyPost.nameCv}"
+													target="_blank">Xem
 													cv</a>
 											</p>
 											<p th:if="${applyPost.status == 0}" style="margin-left: 10px">
 												<a class="btn btn-outline-primary"
-													th:href="${'/user/approve/'} +${applyPost.user.id} +${'/'} +${recruitment.id}">Duyệt</a>
+													th:href="@{/recruitment/approve(applyPostId=${applyPost.id})}">Duyệt</a>
 											</p>
 											<p th:if="${applyPost.status == 1}"
-												style="margin-left: 10px; margin-top: 15px">
+												style="margin-left: 10px; margin-top: 10px">
 												<span style="color: #1e7e34; font-weight: bold">Đã duyệt</span>
 											</p>
 										</div>
@@ -370,55 +368,7 @@
 					</div>
 				</div>
 			</div>
-			<th:block th:each="recruitment : ${listRelated}">
-				<div th:unless="${applyPosts}" class="col-md-12">
-					<div class="job-post-item p-4 d-block d-lg-flex align-items-center">
-						<div class="one-third mb-4 mb-md-0">
-							<div class="job-post-item-header align-items-center">
-								<span class="subadge" th:text="${recruitment.type}"></span>
-								<h2 class="mr-3 text-black">
-									<a th:text="${recruitment.title}"
-										th:href="${'/recruitment/detail/'} +${recruitment.id}"></a>
-								</h2>
-							</div>
-							<div class="job-post-item-body d-block d-md-flex">
-								<div class="mr-3">
-									<span class="icon-layers"></span>
-									<a href="#" th:text="${recruitment.Company.nameCompany}"></a>
-								</div>
-								<div>
-									<span class="icon-my_location"></span>
-									<span th:text="${recruitment.address}"></span>
-								</div>
-							</div>
-						</div>
 
-						<input type="hidden" th:id="${'idRe'}+${recruitment.id}" th:value="${recruitment.id}" />
-						<div th:if="${session.user}" class="one-forth ml-auto d-flex align-items-center mt-4 md-md-0">
-							<div>
-								<a th:onclick="'save(' +${recruitment.id}+ ')'"
-									class="icon text-center d-flex justify-content-center align-items-center icon mr-2">
-									<span class="icon-heart"></span>
-								</a>
-							</div>
-							<a data-toggle="modal" th:data-target="${'#exampleModal'}+${recruitment.id}"
-								class="btn btn-primary py-2">Apply Job</a>
-						</div>
-						<div th:unless="${session.user}"
-							class="one-forth ml-auto d-flex align-items-center mt-4 md-md-0">
-							<div>
-								<a th:onclick="'save(' +${recruitment.id}+ ')'"
-									class="icon text-center d-flex justify-content-center align-items-center icon mr-2">
-									<span class="icon-heart"></span>
-								</a>
-							</div>
-							<a data-toggle="modal" th:data-target="${'#exampleModal'}+${recruitment.id}"
-								class="btn btn-primary py-2">Apply Job</a>
-						</div>
-					</div>
-				</div>
-				<!-- end -->
-			</th:block>
 		</div>
 	</section>
 	<footer class="text-center text-lg-start" style="

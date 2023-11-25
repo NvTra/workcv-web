@@ -55,7 +55,7 @@ public class HomeController {
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitmentBySalary();
 		theModel.addAttribute("recruitments", recruitments);
 		List<Company> companies = companyService.getCompanyTop();
-		
+
 		theModel.addAttribute("companies", companies);
 		return "public/home";
 	}
@@ -68,6 +68,10 @@ public class HomeController {
 		User theUser = userService.findByEmail(email);
 		int userId = theUser.getId();
 		Company theCompany = companyService.getCompanyByUserId(userId);
+		if (theCompany == null) {
+			theCompany = new Company();
+			theCompany.setUser(theUser);
+		}
 		Cv theCv = cvService.getCvByUserId(userId);
 		theModel.addAttribute("Cv", theCv);
 		theModel.addAttribute("user", theUser);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<title>Work CV</title>
@@ -68,7 +68,7 @@
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Ứng cử viên</a>
+						<a th:href="@{/user/list-user}" class="nav-link">Ứng cử viên</a>
 					</li>
 
 					<li sec:authorize="hasRole('EMPLOYER')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
@@ -94,7 +94,7 @@
 
 					<!--CADIDATE-->
 					<li sec:authorize="hasRole('CANDIDATE')" class="nav-item">
-						<a th:href="@{/}" class="nav-link">Công việc</a>
+						<a th:href="@{/user/get-list-apply}" class="nav-link">Công việc</a>
 					</li>
 					<li sec:authorize="hasRole('CANDIDATE')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
 						class="nav-item dropdown">
@@ -390,8 +390,10 @@
 							Chọn logo<input type="file" name="file" id="fileUpload2" required hidden />
 						</label>
 						<div id="divLogo">
-							<img id="avatar1" height="100" width="100" style="border-radius: 50px"
-								th:src="${company.logo != null ?'resources/upload/company/'+ company.logo : 'https://st.quantrimang.com/photos/image/072015/22/avatar.jpg'}" />
+							<img  id="avatar1" height="100" width="100"
+								style="border-radius: 50px"
+								th:src="${company.logo != null ?'/spring-workcv/resources/upload/company/'+ company.logo : 'https://st.quantrimang.com/photos/image/072015/22/avatar.jpg'}"
+								alt="Image" />
 						</div>
 					</div>
 					<form th:action="@{/user/update-company}" th:object="${company}" method="post">
@@ -434,7 +436,7 @@
 										<textarea name="description"
 											th:text="${company.description != null ? company.description : null}"
 											class="form-control" id="editorN" placeholder="Mô tả"></textarea>
-									</div>	
+									</div>
 									<div class="row form-group">
 										<div class="col-md-12">
 											<input type="submit" value="Lưu thông tin"

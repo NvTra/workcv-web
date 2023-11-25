@@ -40,7 +40,7 @@ public class ApplyPostDAOImpl implements ApplyPostDAO {
 
 	// Method confirm that the company has approved the job for the applicant
 	@Override
-	public void confirmPost(int theId) {
+	public void approve(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
 		ApplyPost applyPost = currentSession.get(ApplyPost.class, theId);
 		applyPost.setStatus(1);

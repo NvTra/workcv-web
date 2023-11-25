@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -40,6 +41,7 @@ public class ApplyJobController {
 
 	@Autowired
 	private RecruitmentService recruitmentService;
+
 	@Autowired
 	private ApplyPostService applyPostService;
 
@@ -47,8 +49,8 @@ public class ApplyJobController {
 	private User getUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String email = authentication.getName();
-		User theUser = userService.findByEmail(email);
-		return theUser;
+		User user = userService.findByEmail(email);
+		return user;
 	};
 
 	/**
@@ -59,29 +61,36 @@ public class ApplyJobController {
 	@PostMapping("apply-job1")
 	public @ResponseBody String handleApplyJob1(@RequestParam("idRe") int idRe, @RequestParam("text") String text) {
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		User theUser = getUser();
-		if (theUser == null) {
+		User user = getUser();
+		if (user == null) {
 			return "false";
 		} else {
-			int theId = theUser.getId();
+			int theId = user.getId();
 			Cv cv = cvService.getCvByUserId(theId);
 
 			Recruitment recruitment = recruitmentService.getRecruitmentById(idRe);
-			boolean isApplyJob = theUser.getRecruitments().stream()
-					.anyMatch(applyPost -> applyPost.getId() == recruitment.getId());
-			if (isApplyJob) {
-				return "error";
-			} else {
-				ApplyPost applyPost = new ApplyPost();
-				applyPost.setText(text);
-				applyPost.setRecruitment(recruitment);
-				applyPost.setCreatedAt(formater.format(new Date()));
-				applyPost.setNameCv(cv.getFileName());
-				applyPost.setUser(theUser);
-				applyPost.setStatus(0);
-				applyPostService.saveOrUpdateApplyPost(applyPost);
-				return "true";
+
+			List<ApplyPost> applyPostsList = applyPostService.listApplyPostsByUser(user.getId());
+			boolean isApplyPost = false;
+			for (ApplyPost applyPost : applyPostsList) {
+				if (applyPost.getRecruitment().getId() == idRe) {
+					isApplyPost = true;
+				}
 			}
+			if (isApplyPost) {
+				return "";
+			}
+
+			ApplyPost applyPost = new ApplyPost();
+			applyPost.setText(text);
+			applyPost.setRecruitment(recruitment);
+			applyPost.setCreatedAt(formater.format(new Date()));
+			applyPost.setNameCv(cv.getFileName());
+			applyPost.setUser(user);
+			applyPost.setStatus(0);
+			applyPostService.saveOrUpdateApplyPost(applyPost);
+			return "true";
+
 		}
 
 	}
@@ -93,7 +102,7 @@ public class ApplyJobController {
 	 */
 	@PostMapping("/apply-job")
 	@ResponseBody
-	public String saveimage(@RequestParam CommonsMultipartFile file, @RequestParam("idRe") int idRe,
+	public String handleApplyJob(@RequestParam CommonsMultipartFile file, @RequestParam("idRe") int idRe,
 			@RequestParam("text") String text, HttpSession session) {
 		SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		User user = getUser();
@@ -101,6 +110,17 @@ public class ApplyJobController {
 		if (user == null) {
 			return "false";
 		} else {
+			List<ApplyPost> applyPostsList = applyPostService.listApplyPostsByUser(user.getId());
+			boolean isApplyPost = false;
+			for (ApplyPost applyPost : applyPostsList) {
+				if (applyPost.getRecruitment().getId() == idRe) {
+					isApplyPost = true;
+				}
+			}
+			if (isApplyPost) {
+				return "";
+			}
+
 			int theId = user.getId();
 			Cv cv = cvService.getCvByUserId(theId);
 			String rootDir = UploadFileUtil.UPLOAD_DIR("cvpdf", session);
@@ -121,31 +141,26 @@ public class ApplyJobController {
 				e.printStackTrace();
 				return "Error";
 			}
-			boolean isApplyJob = user.getRecruitments().stream()
-					.anyMatch(applyPost -> applyPost.getId() == recruitment.getId());
-			if (isApplyJob) {
-				return "";
-			} else {
-				if (cv == null) {
-					cv = new Cv();
-				}
-				cv.setUser(user);
-				cv.setFileName(fileName);
-				cvService.saveCv(cv);
 
-				ApplyPost applyPost = new ApplyPost();
-				applyPost.setText(text);
-				applyPost.setRecruitment(recruitment);
-				applyPost.setCreatedAt(formater.format(new Date()));
-				applyPost.setNameCv(cv.getFileName());
-				applyPost.setUser(user);
-				applyPost.setStatus(0);
-				applyPostService.saveOrUpdateApplyPost(applyPost);
-
-				return "true";
+			if (cv == null) {
+				cv = new Cv();
 			}
+			cv.setUser(user);
+			cv.setFileName(fileName);
+			cvService.saveCv(cv);
 
+			ApplyPost applyPost = new ApplyPost();
+			applyPost.setText(text);
+			applyPost.setRecruitment(recruitment);
+			applyPost.setCreatedAt(formater.format(new Date()));
+			applyPost.setNameCv(cv.getFileName());
+			applyPost.setUser(user);
+			applyPost.setStatus(0);
+			applyPostService.saveOrUpdateApplyPost(applyPost);
+
+			return "true";
 		}
+
 	}
 
 }

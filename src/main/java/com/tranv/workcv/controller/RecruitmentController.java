@@ -130,6 +130,12 @@ public class RecruitmentController {
 	// Delete a job post.
 	@GetMapping("/delete")
 	public String deleteRecruitment(@RequestParam("recruitmentId") int recruitmentId) {
+		List<ApplyPost> applyPosts = applyPostService.listApplyPostByRecruitmentId(recruitmentId);
+		System.out.println(applyPosts.size());
+		for (ApplyPost applyPost : applyPosts) {
+			applyPost.setRecruitment(null);
+			applyPostService.saveOrUpdateApplyPost(applyPost);
+		}
 		recruitmentService.deleteRecruitment(recruitmentId);
 		return "redirect:/recruitment/list-post";
 	}
@@ -165,15 +171,12 @@ public class RecruitmentController {
 	}
 
 	// Confirm an applied job post.
-	@GetMapping("/confirmPost")
+	@GetMapping("/approve")
 	public String confirmPost(@RequestParam("applyPostId") int theId) {
-		applyPostService.confirmPost(theId);
+		applyPostService.approve(theId);
 		ApplyPost applyPost = applyPostService.getApplyPostbyId(theId);
 		int recruitmentId = applyPost.getRecruitment().getId();
-		System.out.println(recruitmentId);
 		return "redirect:/recruitment/detail?recruitmentId=" + recruitmentId;
 	}
-
-	
 
 }

@@ -36,8 +36,8 @@ public class ApplyPostServiceImpl implements ApplyPostService {
 	// Method confirm that the company has approved the job for the applicant
 	@Override
 	@Transactional
-	public void confirmPost(int theId) {
-		applyPostDAO.confirmPost(theId);
+	public void approve(int theId) {
+		applyPostDAO.approve(theId);
 
 	}
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <head>
     <title>Work CV</title>
     <meta charset="utf-8" />
@@ -116,7 +116,7 @@
             </li>
 
             <li sec:authorize="hasRole('EMPLOYER')" class="nav-item">
-              <a th:href="@{/}" class="nav-link">Ứng cử viên</a>
+              <a th:href="@{/user/list-user}" class="nav-link">Ứng cử viên</a>
             </li>
 
             <li
@@ -160,7 +160,7 @@
 
             <!--CADIDATE-->
             <li sec:authorize="hasRole('CANDIDATE')" class="nav-item">
-              <a th:href="@{/}" class="nav-link">Công việc</a>
+              <a th:href="@{/user/get-list-apply}" class="nav-link">Công việc</a>
             </li>
             <li
               sec:authorize="hasRole('CANDIDATE')"

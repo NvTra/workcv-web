@@ -111,7 +111,6 @@ public class CompanyController {
 		if (theUser != null) {
 			boolean isFollowed = theUser.getCompanies().stream()
 					.anyMatch(followedCompany -> followedCompany.getId() == theCompany.getId());
-			System.out.println(isFollowed);
 			theModel.addAttribute("theUser", theUser);
 			theModel.addAttribute("isFollowed", isFollowed);
 		}

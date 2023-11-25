@@ -61,7 +61,6 @@ public class UserController {
 	// Update the user's profile.
 	@PostMapping("/update-profile")
 	public String updateProfile(@ModelAttribute("user") User theUser) {
-
 		userService.update(theUser);
 		return "redirect:/detail";
 	}
