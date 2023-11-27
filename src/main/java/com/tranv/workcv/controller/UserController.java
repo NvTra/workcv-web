@@ -32,9 +32,9 @@ import com.tranv.workcv.service.ApplyPostService;
 import com.tranv.workcv.service.CompanyService;
 import com.tranv.workcv.service.CvService;
 import com.tranv.workcv.service.FollowCompanyService;
-
+import com.tranv.workcv.service.MailService;
 import com.tranv.workcv.service.UserService;
-import com.tranv.workcv.until.Pagination;
+import com.tranv.workcv.until.PaginationUtil;
 
 @Controller
 @RequestMapping("/user")
@@ -49,6 +49,8 @@ public class UserController {
 	private CvService cvService;
 	@Autowired
 	private FollowCompanyService followCompanyService;
+	@Autowired
+	private MailService mailService;
 
 	// Retrieve the currently authenticated user.
 	private User getUser() {
@@ -66,6 +68,7 @@ public class UserController {
 	}
 
 	// upload image
+	@SuppressWarnings("null")
 	@PostMapping("/upload")
 	public @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile file,
 			@RequestParam("email") String email, HttpSession session) {
@@ -101,6 +104,7 @@ public class UserController {
 		}
 	}
 
+	@SuppressWarnings("null")
 	@PostMapping("/uploadCv")
 	public @ResponseBody String handleFileUploadCv(@RequestParam("file") MultipartFile file, HttpSession session) {
 		User user = getUser();
@@ -150,7 +154,7 @@ public class UserController {
 		User theUser = getUser();
 		int theId = theUser.getId();
 		List<Company> companies = followCompanyService.listCompanyFollow(theId);
-		Pagination.pagination(companies, currentPage, theModel);
+		PaginationUtil.pagination(companies, currentPage, theModel);
 		return "public/list-follow-company";
 
 	}
@@ -162,15 +166,6 @@ public class UserController {
 		theCompany.setStatus(1);
 		theCompany.setUser(theUser);
 		companyService.saveOrUpdateCompany(theCompany);
-		return "redirect:/detail";
-	}
-
-	// Confirm the user's account.
-	@PostMapping("/confirm-account")
-	public String confirmAccount() {
-		User theUser = getUser();
-		theUser.setStatus(1);
-		userService.update(theUser);
 		return "redirect:/detail";
 	}
 
@@ -190,7 +185,7 @@ public class UserController {
 		Company theCompany = companyService.getCompanyByUserId(userId);
 		int companyId = theCompany.getId();
 		List<ApplyPost> applyPosts = applyPostService.listApplyPostsByCompany(companyId);
-		Pagination.pagination(applyPosts, currentPage, theModel);
+		PaginationUtil.pagination(applyPosts, currentPage, theModel);
 		return "public/list-user";
 	}
 
@@ -201,7 +196,7 @@ public class UserController {
 		User theUser = getUser();
 		int theId = theUser.getId();
 		List<ApplyPost> applyPosts = applyPostService.listApplyPostsByUser(theId);
-		Pagination.pagination(applyPosts, currentPage, theModel);
+		PaginationUtil.pagination(applyPosts, currentPage, theModel);
 		return "public/list-apply-job";
 	}
 
@@ -212,4 +207,21 @@ public class UserController {
 		return "redirect:/user/get-list-apply";
 
 	}
+
+	// Confirm the user's account.
+	@GetMapping("/confirm-account")
+	public String confirmAccount() {
+		User theUser = getUser();
+		theUser.setStatus(1);
+		userService.update(theUser);
+		return "redirect:/detail";
+	}
+
+	@PostMapping("/send-email-verify")
+	public String sendEmail(@ModelAttribute("email") String email) {
+		User user = getUser();
+		mailService.sendEmailVerify(email, user);
+		return "redirect:/";
+	}
+
 }

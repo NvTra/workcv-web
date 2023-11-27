@@ -26,7 +26,7 @@ import com.tranv.workcv.service.CompanyService;
 import com.tranv.workcv.service.RecruitmentService;
 import com.tranv.workcv.service.SaveJobService;
 import com.tranv.workcv.service.UserService;
-import com.tranv.workcv.until.Pagination;
+import com.tranv.workcv.until.PaginationUtil;
 
 @Controller
 @RequestMapping("/recruitment")
@@ -74,7 +74,7 @@ public class RecruitmentController {
 	public String showDonation(@RequestParam(name = "page", defaultValue = "1") int currentPage, Model theModel) {
 		Company company = getCompanyByUser();
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitmentByCompany(company.getId());
-		Pagination.pagination(recruitments, currentPage, theModel);
+		PaginationUtil.pagination(recruitments, currentPage, theModel);
 		return "public/post-list";
 	}
 
@@ -145,7 +145,7 @@ public class RecruitmentController {
 	public String searchRecruitment(@RequestParam(name = "page", defaultValue = "1") int currentPage,
 			@RequestParam("keySearch") String keySearch, Model theModel) {
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitment(keySearch);
-		Pagination.pagination(recruitments, currentPage, theModel);
+		PaginationUtil.pagination(recruitments, currentPage, theModel);
 		theModel.addAttribute("keySearch", keySearch);
 		return "public/result-search";
 	}
@@ -155,7 +155,7 @@ public class RecruitmentController {
 	public String searchAdress(@RequestParam(name = "page", defaultValue = "1") int currentPage,
 			@RequestParam("keySearch") String keySearch, Model theModel) {
 		List<Recruitment> recruitments = recruitmentService.getResultAdress(keySearch);
-		Pagination.pagination(recruitments, currentPage, theModel);
+		PaginationUtil.pagination(recruitments, currentPage, theModel);
 		theModel.addAttribute("keySearch", keySearch);
 		return "public/result-search-address";
 	}
@@ -165,7 +165,7 @@ public class RecruitmentController {
 	public String searchCompany(@RequestParam(name = "page", defaultValue = "1") int currentPage,
 			@RequestParam("keySearch") String keySearch, Model theModel) {
 		List<Recruitment> recruitments = recruitmentService.getResultCompany(keySearch);
-		Pagination.pagination(recruitments, currentPage, theModel);
+		PaginationUtil.pagination(recruitments, currentPage, theModel);
 		theModel.addAttribute("keySearch", keySearch);
 		return "public/result-search-company";
 	}
@@ -179,4 +179,14 @@ public class RecruitmentController {
 		return "redirect:/recruitment/detail?recruitmentId=" + recruitmentId;
 	}
 
+	// Recruitment list category
+	@GetMapping("/category")
+	public String getListRecruitmentByCategory(@RequestParam(name = "page", defaultValue = "1") int currentPage,
+			@RequestParam("categoryId") int categoryId, Model model) {
+		List<Recruitment> recruitments = recruitmentService.getListRecruitmentsbyCategory(categoryId);
+		Category category = categoryService.getCategoryById(categoryId);
+		model.addAttribute("category", category);
+		PaginationUtil.pagination(recruitments, currentPage, model);
+		return "public/result-category-list";
+	}
 }

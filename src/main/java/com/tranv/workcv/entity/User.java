@@ -60,6 +60,9 @@ public class User {
 	@Column(name = "status")
 	private int status;
 
+	@Column(name = "isActive")
+	private boolean isActive;
+	
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
 	@JoinColumn(name = "role_id")
 	private Role role;
@@ -87,6 +90,5 @@ public class User {
 	@JoinTable(name = "save_job", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "recruitment_id") })
 	private Set<Recruitment> recruitments = new HashSet<>();
-
 
 }

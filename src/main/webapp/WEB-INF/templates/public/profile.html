@@ -176,7 +176,7 @@
 				nút Nhận email xác thực dưới đây.
 			</p>
 			<div class="row form-group">
-				<form action="/user/confirm-account" method="post" class="col-md-12">
+				<form th:action="@{/user/send-email-verify}" method="post" class="col-md-12">
 					<input type="hidden" th:value="${user.email}" name="email"
 						class="btn px-4 btn-primary text-white" />
 					<input type="submit" value="Nhận email xác thực" class="btn px-4 btn-primary text-white" />
@@ -206,7 +206,8 @@
 	</div>
 
 	<!-- Người ứng tuyển -->
-	<section sec:authorize="hasRole('CANDIDATE')" class="site-section" style="margin-top: 10px">
+	<section th:if="${user.status == 1}" sec:authorize="hasRole('CANDIDATE')" class="site-section"
+		style="margin-top: 10px">
 		<div class="container">
 			<form enctype="multipart/form-data">
 				<div class="row align-items-center mb-5">
@@ -327,7 +328,7 @@
 	</div>
 
 	<!-- Nhà tuyển dụng -->
-	<section sec:authorize="hasRole('EMPLOYER')" class="site-section" style="margin-top: 10px">
+	<section  th:if="${user.status == 1}" sec:authorize="hasRole('EMPLOYER')" class="site-section" style="margin-top: 10px">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 mb-5">
@@ -390,8 +391,7 @@
 							Chọn logo<input type="file" name="file" id="fileUpload2" required hidden />
 						</label>
 						<div id="divLogo">
-							<img  id="avatar1" height="100" width="100"
-								style="border-radius: 50px"
+							<img id="avatar1" height="100" width="100" style="border-radius: 50px"
 								th:src="${company.logo != null ?'/spring-workcv/resources/upload/company/'+ company.logo : 'https://st.quantrimang.com/photos/image/072015/22/avatar.jpg'}"
 								alt="Image" />
 						</div>

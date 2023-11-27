@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -86,7 +87,7 @@ public class AppConfig implements WebMvcConfigurer {
 	public SimpleMappingExceptionResolver exceptionResolver() {
 		SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
 		Properties exceptionMappings = new Properties();
-		exceptionMappings.put("javax.servlet.ServletException", "404");
+		exceptionMappings.put("javax.servlet.ServletException", 404);
 		exceptionMappings.put("java.lang.Exception", "errors/error-404");
 		resolver.setExceptionMappings(exceptionMappings);
 		return resolver;
@@ -176,6 +177,24 @@ public class AppConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+	}
+	// Mail Sender configuration
+
+	@Bean
+	public JavaMailSenderImpl javaMailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
+		mailSender.setUsername("tranvfx22252@funix.edu.vn");
+		mailSender.setPassword("emwevzahpvdgghzm");
+
+		Properties javaMailProperties = new Properties();
+		javaMailProperties.setProperty("mail.transport.protocol", "smtp");
+		javaMailProperties.setProperty("mail.smtp.auth", "true");
+		javaMailProperties.setProperty("mail.smtp.starttls.enable", "true");
+
+		mailSender.setJavaMailProperties(javaMailProperties);
+		return mailSender;
 	}
 
 }

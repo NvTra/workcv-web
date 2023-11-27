@@ -24,4 +24,6 @@ public interface RecruitmentService {
 	public List<Recruitment> getResultAdress(String searchTerm);
 
 	public List<Recruitment> getResultCompany(String searchTerm);
+
+	public List<Recruitment> getListRecruitmentsbyCategory(int categoryId);
 }

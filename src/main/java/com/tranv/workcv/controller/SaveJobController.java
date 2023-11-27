@@ -19,7 +19,7 @@ import com.tranv.workcv.entity.User;
 import com.tranv.workcv.service.RecruitmentService;
 import com.tranv.workcv.service.SaveJobService;
 import com.tranv.workcv.service.UserService;
-import com.tranv.workcv.until.Pagination;
+import com.tranv.workcv.until.PaginationUtil;
 
 @Controller
 @RequestMapping("/save-job")
@@ -76,7 +76,7 @@ public class SaveJobController {
 		User theUser = getUser();
 		int theId = theUser.getId();
 		List<Recruitment> recruitments = saveJobService.listSaveJobByUser(theId);
-		Pagination.pagination(recruitments, currentPage, model);
+		PaginationUtil.pagination(recruitments, currentPage, model);
 		return "public/list-save-job";
 	}
 

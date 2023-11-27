@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,16 +21,10 @@ import com.tranv.workcv.service.UserService;
 public class AuthController {
 	@Autowired
 	private UserService userService;
-	
+
 	// Handle the request to show the login page.
 	@GetMapping("/login")
 	public String login() {
-		return "/public/login";
-	}
-
-	// Handle the request to show the login form.
-	@GetMapping("/showFormLogin")
-	public String showFormLogin() {
 		return "/public/login";
 	}
 
@@ -50,7 +43,7 @@ public class AuthController {
 	public String accessDeniel() {
 		return "errors/error-404";
 	}
-	
+
 	/**
 	 * Add a new user. This method saves the new user using the userService and
 	 * redirects the user to the home page.
@@ -58,7 +51,6 @@ public class AuthController {
 
 	@PostMapping("/register")
 	public String addUser(@ModelAttribute("newUser") RegisterDTO newUser) {
-		System.out.println(newUser.toString());
 		userService.saveUser(newUser);
 		return "redirect:/";
 	}

@@ -128,4 +128,14 @@ public class RecruitmentDAOImpl implements RecruitmentDAO {
 		return recruitments;
 	}
 
+	@Override
+	public List<Recruitment> getListRecruitmentsbyCategory(int categoryId) {
+		Session currentSession = sessionFactory.getCurrentSession();
+		Query<Recruitment> theQuery = currentSession.createQuery(
+				"SELECT r FROM Recruitment r JOIN r.category c WHERE c.id = :categoryId", Recruitment.class);
+		theQuery.setParameter("categoryId", categoryId);
+		List<Recruitment> recruitments = theQuery.getResultList();
+		return recruitments;
+	}
+
 }

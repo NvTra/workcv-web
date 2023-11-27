@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.ui.Model;
 
 
-public class Pagination {
+public class PaginationUtil {
 	public static <T> void pagination(List<T> list, int currentPage, Model theModel) {
 		int itemsPerPage = 5;
 		int totalPages = (int) Math.ceil((double) list.size() / itemsPerPage);

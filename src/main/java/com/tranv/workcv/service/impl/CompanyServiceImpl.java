@@ -53,9 +53,6 @@ public class CompanyServiceImpl implements CompanyService {
 		companyDAO.saveOrUpdateCompany(theCompany);
 	}
 
-	@Override
-	public int numberOfApplicants(int companyId) {
-		return companyDAO.numberOfApplicants(companyId);
-	}
+
 
 }

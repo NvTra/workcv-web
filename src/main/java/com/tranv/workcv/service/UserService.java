@@ -2,10 +2,14 @@ package com.tranv.workcv.service;
 
 import java.util.List;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.tranv.workcv.dto.RegisterDTO;
 import com.tranv.workcv.entity.User;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
+
+	
 	public List<User> getListUsers();
 
 	public User getUserById(int theId);

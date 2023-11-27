@@ -9,9 +9,11 @@ public class RegisterDTO {
 	private String email;
 	private String fullName;
 	private String password;
+
 	private String rePassword;
 	private int roleId;
 
-	
-	
+	public boolean passwordsMatch() {
+		return password.equals(rePassword);
+	}
 }

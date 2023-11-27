@@ -90,4 +90,11 @@ public class RecruitmentServiceImpl implements RecruitmentService {
 		return recruitmentDAO.getResultCompany(searchTerm);
 	}
 
+	@Override
+	@Transactional
+	public List<Recruitment> getListRecruitmentsbyCategory(int categoryId) {
+
+		return recruitmentDAO.getListRecruitmentsbyCategory(categoryId);
+	}
+
 }

@@ -28,7 +28,6 @@ import com.tranv.workcv.service.ApplyPostService;
 import com.tranv.workcv.service.CvService;
 import com.tranv.workcv.service.RecruitmentService;
 import com.tranv.workcv.service.UserService;
-import com.tranv.workcv.until.UploadFileUtil;
 
 @Controller
 @RequestMapping("/apply")
@@ -100,6 +99,7 @@ public class ApplyJobController {
 	 * attributes of the ApplyPost object, saves the ApplyPost to the database, and
 	 * redirects the user to the home page.
 	 */
+	@SuppressWarnings("null")
 	@PostMapping("/apply-job")
 	@ResponseBody
 	public String handleApplyJob(@RequestParam CommonsMultipartFile file, @RequestParam("idRe") int idRe,
@@ -123,7 +123,7 @@ public class ApplyJobController {
 
 			int theId = user.getId();
 			Cv cv = cvService.getCvByUserId(theId);
-			String rootDir = UploadFileUtil.UPLOAD_DIR("cvpdf", session);
+			String rootDir = session.getServletContext().getRealPath("/resources/upload/cvpdf");
 			int index = file.getOriginalFilename().lastIndexOf(".");
 			String extension = null;
 			if (index > 0) {

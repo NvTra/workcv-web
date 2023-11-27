@@ -29,7 +29,7 @@ import com.tranv.workcv.service.CompanyService;
 import com.tranv.workcv.service.FollowCompanyService;
 import com.tranv.workcv.service.RecruitmentService;
 import com.tranv.workcv.service.UserService;
-import com.tranv.workcv.until.Pagination;
+import com.tranv.workcv.until.PaginationUtil;
 
 @Controller
 @RequestMapping("/company")
@@ -60,11 +60,12 @@ public class CompanyController {
 			@RequestParam("companyId") int CompanyId, Model theModel) {
 		Company theCompany = companyService.getCompanyById(CompanyId);
 		List<Recruitment> recruitments = recruitmentService.getResultRecruitmentByCompany(CompanyId);
-		Pagination.pagination(recruitments, currentPage, theModel);
+		PaginationUtil.pagination(recruitments, currentPage, theModel);
 		theModel.addAttribute("company", theCompany);
 		return "public/post-company";
 	}
 
+	@SuppressWarnings("null")
 	@PostMapping("/upload-company")
 	public @ResponseBody String handleFileUploadCv(@RequestParam("file") MultipartFile file, HttpSession session) {
 		User user = getUser();

@@ -1,8 +1,14 @@
 package com.tranv.workcv.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,5 +76,27 @@ public class UserServiceImpl implements UserService {
 	public User lockUser(int theId) {
 		return userDAO.lockUser(theId);
 	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userDAO.findByEmail(username);
+		if (user == null) {
+			throw new UsernameNotFoundException("Invalid username or password.");
+		}
+		Set<GrantedAuthority> authorities = new HashSet<>();
+		authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
+		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+
+//		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+//				mapRolesToAuthorities(user.getRole()));
+	}
+
+	/*
+	 * private Collection<? extends GrantedAuthority>
+	 * mapRolesToAuthorities(Collection<Role> roles) {
+	 * 
+	 * return roles.stream().map(role -> new
+	 * SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList()); }
+	 */
 
 }

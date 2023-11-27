@@ -6,6 +6,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.tranv.workcv.dao.UserDAO;
@@ -42,11 +44,11 @@ public class UserDaoImpl implements UserDAO {
 	// Method to save user to database
 	@Override
 	public void saveUser(RegisterDTO theUser) {
-		
+
 		Session currentSession = sessionFactory.getCurrentSession();
 		User newUser = convertToEntity(theUser);
-		
 		newUser.setStatus(1);
+		newUser.setActive(true);
 		currentSession.save(newUser);
 
 	}
@@ -93,10 +95,12 @@ public class UserDaoImpl implements UserDAO {
 		User newUser = new User();
 		newUser.setEmail(dto.getEmail());
 		newUser.setFullName(dto.getFullName());
-		newUser.setPassword("{noop}" + dto.getPassword());
+		newUser.setPassword(passwordEncoder().encode(dto.getPassword()));
 		newUser.setRole(roleService.getRolebyRoleId(dto.getRoleId()));
 		return newUser;
 	}
 
-
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }
