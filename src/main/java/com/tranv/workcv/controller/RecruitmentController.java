@@ -64,6 +64,10 @@ public class RecruitmentController {
 	// Handle the request to display the job post form.
 	@GetMapping("/post")
 	public String postJob(Model theModel) {
+		User user = getUser();
+		if (user.getStatus()==0) {
+			return "redirect:/detail";
+		}
 		List<Category> categories = categoryService.getCategories();
 		theModel.addAttribute("categories", categories);
 		return "public/post-job";
