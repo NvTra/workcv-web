@@ -65,7 +65,7 @@ public class UserDaoImpl implements UserDAO {
 	@Override
 	public void deleteUser(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
-		Query<User> theQuery = currentSession.createQuery("delete from User where id:=userId", User.class);
+		Query theQuery = currentSession.createQuery("delete from User where id =:userId");
 		theQuery.setParameter("userId", theId);
 		theQuery.executeUpdate();
 
@@ -86,7 +86,11 @@ public class UserDaoImpl implements UserDAO {
 	public User lockUser(int theId) {
 		Session currentSession = sessionFactory.getCurrentSession();
 		User theUser = currentSession.get(User.class, theId);
-		theUser.setStatus(1);
+		if (theUser.getStatus() == 0) {
+			theUser.setStatus(1);
+		} else {
+			theUser.setStatus(0);
+		}
 		currentSession.update(theUser);
 		return theUser;
 	}

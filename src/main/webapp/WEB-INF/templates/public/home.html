@@ -61,6 +61,23 @@
 					<li class="nav-item active">
 						<a th:href="@{/}" class="nav-link">Trang chủ</a>
 					</li>
+					<!-- ADMIN -->
+										
+					<li sec:authorize="hasRole('ADMIN')" th:if="${not #strings.isEmpty(#request.remoteUser)}"
+						class="nav-item dropdown">
+						<a style="color: white" class="nav-link" href="#" id="navbarDropdownMenuLink" role="button"
+							data-toggle="dropdown" aria-expanded="false">Quản lý</a>
+						<ul style="left: -85px !important" class="dropdown-menu"
+							aria-labelledby="navbarDropdownMenuLink">
+							<li>
+								<a class="dropdown-item" th:href="@{/admin/manager-user}">Quản lý tài khoản</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/logout}">Đăng xuất</a>
+							</li>
+						</ul>
+					</li>
+					
 					<!-- EMPLOYER -->
 					<li sec:authorize="hasRole('EMPLOYER')" class="nav-item">
 						<a th:href="@{/recruitment/list-post}" class="nav-link">Công việc</a>

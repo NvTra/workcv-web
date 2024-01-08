@@ -14,7 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tranv.workcv.dao.UserDAO;
 import com.tranv.workcv.dto.RegisterDTO;
+import com.tranv.workcv.entity.ApplyPost;
+import com.tranv.workcv.entity.Company;
 import com.tranv.workcv.entity.User;
+import com.tranv.workcv.service.ApplyPostService;
+import com.tranv.workcv.service.CompanyService;
 import com.tranv.workcv.service.UserService;
 
 @Service
@@ -23,6 +27,10 @@ public class UserServiceImpl implements UserService {
 	// Service handles operations related to the User object
 	@Autowired
 	private UserDAO userDAO;
+	@Autowired
+	private ApplyPostService applyPostService;
+	@Autowired
+	private CompanyService companyService;
 
 	// Method to get a list of all users from the database
 	@Override
@@ -58,6 +66,15 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void deleteUser(int theId) {
+		List<ApplyPost> applyPosts = applyPostService.listApplyPostsByUser(theId);
+		for (ApplyPost applyPost : applyPosts) {
+			applyPost.setUser(null);
+		}
+		Company company = companyService.getCompanyByUserId(theId);
+		if (company != null) {
+			company.setUser(null);
+			company.setUsers(null);
+		}
 		userDAO.deleteUser(theId);
 
 	}

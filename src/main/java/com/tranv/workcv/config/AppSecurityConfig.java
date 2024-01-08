@@ -72,13 +72,18 @@ public class AppSecurityConfig {
 
 				.antMatchers("/", "/sign-up").permitAll()
 
+				.antMatchers("/auth/**", "/recruitment/**", "/apply", "/company", "/recruitment", "/save-job")
+				.permitAll()
+
 				.antMatchers("/savefile/**").permitAll()
 
 				.antMatchers("/user/addUser").permitAll()
 
 				.antMatchers("/user/**").hasAnyRole("EMPLOYER", "CANDIDATE")
 
-				.antMatchers("/**").permitAll()
+				.antMatchers("/admin/**").hasRole("ADMIN")
+
+//				.antMatchers("/**").permitAll()
 
 				.antMatchers("/resources/**").permitAll()
 
@@ -90,11 +95,13 @@ public class AppSecurityConfig {
 
 				.antMatchers("/fonts/**").permitAll()
 
-				.antMatchers("/images/**").permitAll())
+				.antMatchers("/images/**").permitAll()
+
+				.anyRequest().authenticated())
 
 				.formLogin(configuarer -> configuarer
 
-						.loginPage("/showFormLogin").loginProcessingUrl("/authenticateTheUser")
+						.loginPage("/auth/login").loginProcessingUrl("/authenticateTheUser")
 						.failureUrl("/auth/login?error=true").usernameParameter("email").passwordParameter("password")
 						.permitAll())
 
