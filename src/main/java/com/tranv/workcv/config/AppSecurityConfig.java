@@ -78,7 +78,9 @@ public class AppSecurityConfig {
 				.antMatchers("/savefile/**").permitAll()
 
 				.antMatchers("/user/addUser").permitAll()
-
+				
+				.antMatchers("/company/detail-company").permitAll()
+				
 				.antMatchers("/user/**").hasAnyRole("EMPLOYER", "CANDIDATE")
 
 				.antMatchers("/admin/**").hasRole("ADMIN")

@@ -83,15 +83,15 @@ public class AppConfig implements WebMvcConfigurer {
 	}
 	// config page 404
 
-	@Bean
-	public SimpleMappingExceptionResolver exceptionResolver() {
-		SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
-		Properties exceptionMappings = new Properties();
-		exceptionMappings.put("javax.servlet.ServletException", 404);
-		exceptionMappings.put("java.lang.Exception", "errors/error-404");
-		resolver.setExceptionMappings(exceptionMappings);
-		return resolver;
-	}
+//	@Bean
+//	public SimpleMappingExceptionResolver exceptionResolver() {
+//		SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
+//		Properties exceptionMappings = new Properties();
+//		exceptionMappings.put("javax.servlet.ServletException", 404);
+//		exceptionMappings.put("java.lang.Exception", "errors/error-404");
+//		resolver.setExceptionMappings(exceptionMappings);
+//		return resolver;
+//	}
 
 	// Define Database DataSource / connection pool
 	@Bean

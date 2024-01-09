@@ -72,6 +72,8 @@ public class CompanyController {
 		Company company = companyService.getCompanyByUserId(user.getId());
 		if (company == null) {
 			company = new Company();
+			company.setUser(user);
+			companyService.saveOrUpdateCompany(company);
 		}
 		try {
 
@@ -141,7 +143,6 @@ public class CompanyController {
 				return "true";
 			}
 
-			
 		}
 	}
 
