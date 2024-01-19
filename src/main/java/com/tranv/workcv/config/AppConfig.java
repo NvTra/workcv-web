@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -19,7 +20,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
@@ -45,6 +47,7 @@ public class AppConfig implements WebMvcConfigurer {
 	 * viewResolver.setPrefix("/WEB-INF/view/"); viewResolver.setSuffix(".jsp");
 	 * return viewResolver; }
 	 **/
+
 //	Define Spring MVC view Thymeleaf
 
 	@Bean
@@ -62,7 +65,13 @@ public class AppConfig implements WebMvcConfigurer {
 		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 		templateEngine.setTemplateResolver(templateResolver());
 		templateEngine.setEnableSpringELCompiler(true);
+		templateEngine.addDialect(securityDialect());
 		return templateEngine;
+	}
+
+	@Bean
+	public SpringSecurityDialect securityDialect() {
+		return new SpringSecurityDialect();
 	}
 
 	@Bean
@@ -72,8 +81,19 @@ public class AppConfig implements WebMvcConfigurer {
 		viewResolver.setCharacterEncoding("UTF-8");
 		return viewResolver;
 	}
+	// config page 404
 
-//	Step 1: Define Database DataSource / connection pool
+//	@Bean
+//	public SimpleMappingExceptionResolver exceptionResolver() {
+//		SimpleMappingExceptionResolver resolver = new SimpleMappingExceptionResolver();
+//		Properties exceptionMappings = new Properties();
+//		exceptionMappings.put("javax.servlet.ServletException", 404);
+//		exceptionMappings.put("java.lang.Exception", "errors/error-404");
+//		resolver.setExceptionMappings(exceptionMappings);
+//		return resolver;
+//	}
+
+	// Define Database DataSource / connection pool
 	@Bean
 	public DataSource dataSource() {
 		// create connection pool
@@ -125,7 +145,7 @@ public class AppConfig implements WebMvcConfigurer {
 		return intPropVal;
 	}
 
-	// Step 2: Setup Hibernate session factory
+	// Setup Hibernate session factory
 	@Bean
 	public LocalSessionFactoryBean sessionFactory() {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -138,7 +158,7 @@ public class AppConfig implements WebMvcConfigurer {
 		return sessionFactory;
 	}
 
-	// Step 3: Setup Hibernate transaction manager
+	// Setup Hibernate transaction manager
 	@Bean
 	public HibernateTransactionManager myTransactionManager() {
 		HibernateTransactionManager transactionManager = new HibernateTransactionManager();
@@ -146,7 +166,7 @@ public class AppConfig implements WebMvcConfigurer {
 		return transactionManager;
 	}
 
-	// Step 4: Enable configuration of transactional behavior based on annotations
+	// Enable configuration of transactional behavior based on annotations
 	@Bean
 	public CommonsMultipartResolver multipartResolver() {
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
@@ -157,6 +177,24 @@ public class AppConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+	}
+	// Mail Sender configuration
+
+	@Bean
+	public JavaMailSenderImpl javaMailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
+		mailSender.setUsername("tranvfx22252@funix.edu.vn");
+		mailSender.setPassword("emwevzahpvdgghzm");
+
+		Properties javaMailProperties = new Properties();
+		javaMailProperties.setProperty("mail.transport.protocol", "smtp");
+		javaMailProperties.setProperty("mail.smtp.auth", "true");
+		javaMailProperties.setProperty("mail.smtp.starttls.enable", "true");
+
+		mailSender.setJavaMailProperties(javaMailProperties);
+		return mailSender;
 	}
 
 }

@@ -17,7 +17,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,8 +51,8 @@ public class Company {
 	private String description;
 
 	@Lob
-	@Column(name = "logo", columnDefinition = "MEDIUMBLOB")
-	private byte[] logo;
+	@Column(name = "logo")
+	private String logo;
 
 	@Column(name = "status")
 	private int status;
@@ -68,7 +67,5 @@ public class Company {
 
 	@ManyToMany(mappedBy = "companies")
 	private Set<User> users = new HashSet<User>();
-	
-
 
 }

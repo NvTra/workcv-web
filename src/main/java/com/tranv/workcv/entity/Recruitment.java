@@ -80,6 +80,8 @@ public class Recruitment {
 	@OneToMany(mappedBy = "recruitment", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
 			CascadeType.REFRESH })
 	private List<ApplyPost> applyPosts;
+	
+	
 	@ManyToMany(mappedBy = "recruitments")
 	private Set<User> users = new HashSet<User>();
 
