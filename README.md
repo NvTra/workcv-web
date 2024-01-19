@@ -31,4 +31,4 @@ Hiện nay các nhà đầu tư về lĩnh vực tuyển dụng, headhunter đa 
 # Cài đặt:
 - Dowload code về máy.
 - import vào eclipes.
-- thay đổi cấu hình data file aplication.properties
+- thay đổi cấu hình appconfig dòng 188 và 189 để gửi mail xác nhận.
